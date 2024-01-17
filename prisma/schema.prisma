@@ -1,0 +1,113 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  username String
+  password String
+  email String @unique
+  phoneNumber Int
+  firstName String
+  lastName String
+  role Role @default(USER)
+  events Event[]
+  reviews Review[]
+  tickets Ticket[]
+  benefits Benefit[]
+  referrals Referral[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Event {
+  id Int @id @default(autoincrement())
+  name String
+  description String
+  startDate DateTime
+  endDate DateTime
+  startTime DateTime
+  endTime DateTime
+  location String
+  type String
+  users User[]
+  reviews Review[]
+  tickets Ticket[]
+  referrals Referral[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Ticket {
+  id Int @id @default(autoincrement())
+  code String
+  price Int
+  quantity Int
+  available Boolean
+  category String
+  user User @relation(fields: [userId], references: [id])
+  userId Int
+  events Event[]
+  transactions Transaction[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Transaction {
+  id Int @id @default(autoincrement())
+  code String
+  date DateTime
+  status String
+  period DateTime
+  tickets Ticket[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Review {
+  id Int @id @default(autoincrement())
+  rating Int
+  title String
+  description String
+  user User @relation(fields: [userId], references: [id])
+  userId Int
+  event Event @relation(fields: [eventId], references: [id])
+  eventId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Referral {
+  id Int @id @default(autoincrement())
+  code String
+  discount Int
+  quantity Int
+  source String
+  expire DateTime
+  users User[]
+  events Event[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Benefit {
+  id Int @id @default(autoincrement())
+  point Int
+  expire DateTime
+  users User[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
