@@ -15,7 +15,7 @@ model User {
   username String
   password String
   email String @unique
-  phoneNumber Int
+  phoneNumber String @db.VarChar(15)
   firstName String
   lastName String
   role Role @default(USER)
@@ -37,10 +37,9 @@ model Event {
   id Int @id @default(autoincrement())
   name String
   description String
+  image String
   startDate DateTime
   endDate DateTime
-  startTime DateTime
-  endTime DateTime
   location String
   type String
   users User[]
