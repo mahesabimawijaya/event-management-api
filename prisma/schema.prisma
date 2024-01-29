@@ -10,103 +10,189 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id Int @id @default(autoincrement())
-  username String
-  password String
-  email String @unique
-  phoneNumber String @db.VarChar(15)
-  firstName String
-  lastName String
-  role Role @default(USER)
-  events Event[]
-  reviews Review[]
-  tickets Ticket[]
-  benefits Benefit[]
-  referrals Referral[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model template {
+  id          Int           @id                   @default(autoincrement())
+  createdAt   DateTime?      @default(now())
+  updatedAt   DateTime?      @default(now())
 }
 
-enum Role {
-  USER
-  ADMIN
+model user {
+  id            Int           @id                 @default(autoincrement())
+  username      String?        @db.VarChar(255)
+  password      String?        @db.VarChar(255)
+  email         String?        @db.VarChar(255)
+  phone_number  String?        @db.VarChar(255)
+  first_name    String?        @db.VarChar(255)
+  last_name     String?        @db.VarChar(255)
+  createdAt     DateTime?      @default(now())
+  updatedAt     DateTime?      @default(now())
+  event_user_relation event_user_relation[]
+  user_role_relation user_role_relation[]
+  event_user_review_relation event_user_review_relation[]
+  user_benefit_relation user_benefit_relation[]
+  user_referral_relation user_referral_relation[]
 }
 
-model Event {
-  id Int @id @default(autoincrement())
-  name String
-  description String
-  image String
-  startDate DateTime
-  endDate DateTime
-  location String
-  type String
-  users User[]
-  reviews Review[]
-  tickets Ticket[]
-  referrals Referral[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model event {
+  id          Int           @id                   @default(autoincrement())
+  name        String?        @db.VarChar(255)
+  description String?        @db.VarChar(255)
+  start_date  DateTime?      @db.Date()
+  end_date    DateTime?      @db.Date()
+  start_time  DateTime?      @db.Time()
+  end_time    DateTime?      @db.Time()
+  location    String?        @db.VarChar(255)
+  type        String?        @db.VarChar(255)
+  createdAt   DateTime?      @default(now())
+  updatedAt   DateTime?      @default(now())
+  event_user_relation event_user_relation[]
+  event_user_review_relation event_user_review_relation[]
+  event_ticket_relation event_ticket_relation[]
+  event_referral_relation event_referral_relation[]
 }
 
-model Ticket {
-  id Int @id @default(autoincrement())
-  code String
-  price Int
-  quantity Int
-  available Boolean
-  category String
-  user User @relation(fields: [userId], references: [id])
-  userId Int
-  events Event[]
-  transactions Transaction[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model ticket {
+  id          Int           @id                   @default(autoincrement())
+  code        String?        @db.VarChar(255)
+  price       Int?           @db.Int()
+  quantity    Int?           @db.Int()
+  available   Int?           @db.Int()
+  category    String?        @db.VarChar(255)
+  createdAt   DateTime?      @default(now())
+  updatedAt   DateTime?      @default(now())
+  event_ticket_relation event_ticket_relation[]
+  ticket_transaction_relation ticket_transaction_relation[]
 }
 
-model Transaction {
-  id Int @id @default(autoincrement())
-  code String
-  date DateTime
-  status String
-  period DateTime
-  tickets Ticket[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model transaction {
+  id          Int           @id                   @default(autoincrement())
+  code        String?        @db.VarChar(255)
+  status      String?        @db.VarChar(255)
+  period      DateTime?      @db.Time()
+  createdAt   DateTime?      @default(now())
+  updatedAt   DateTime?      @default(now())
+  ticket_transaction_relation ticket_transaction_relation[]
 }
 
-model Review {
-  id Int @id @default(autoincrement())
-  rating Int
-  title String
-  description String
-  user User @relation(fields: [userId], references: [id])
-  userId Int
-  event Event @relation(fields: [eventId], references: [id])
-  eventId Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model role {
+  id          Int           @id                   @default(autoincrement())
+  roles       String?        @db.VarChar(255)
+  createdAt   DateTime?      @default(now())
+  updatedAt   DateTime?      @default(now())
+  user_role_relation user_role_relation[]
 }
 
-model Referral {
-  id Int @id @default(autoincrement())
-  code String
-  discount Int
-  quantity Int
-  source String
-  expire DateTime
-  users User[]
-  events Event[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model review {
+  id          Int           @id                   @default(autoincrement())
+  rating      Int?           @db.Int()
+  title       String?        @db.VarChar(255)
+  description String?        @db.VarChar(255)
+  createdAt   DateTime?      @default(now())
+  updatedAt   DateTime?      @default(now())
+  event_user_review_relation event_user_review_relation[]
 }
 
-model Benefit {
-  id Int @id @default(autoincrement())
-  point Int
-  expire DateTime
-  users User[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model benefit {
+  id          Int           @id                   @default(autoincrement())
+  point       Int?           @db.Int()
+  expire      DateTime?      @db.DateTime()
+  createdAt   DateTime?      @default(now())
+  updatedAt   DateTime?      @default(now())
+  user_benefit_relation user_benefit_relation[]
+}
+
+
+model referral {
+  id          Int           @id                   @default(autoincrement())
+  code        String?        @db.VarChar(255)
+  discount    String?        @db.VarChar(255)
+  quantity    Int?           @db.Int()
+  source      String?        @db.VarChar(255)
+  expire      DateTime?      @db.DateTime()
+  createdAt   DateTime?      @default(now())
+  updatedAt   DateTime?      @default(now())
+  event_referral_relation event_referral_relation[]
+  user_referral_relation user_referral_relation[]
+} 
+
+model event_user_relation {
+  id          Int           @id                   @default(autoincrement())
+  event_id    Int?
+  user_id     Int?
+  event_id_relation event?  @relation(fields:[event_id], references: [id])
+  user_id_relation user?  @relation(fields:[user_id], references: [id])
+  createdAt   DateTime?      @default(now())
+  updatedAt   DateTime?      @default(now())
+}
+
+model user_role_relation {
+  id          Int           @id                   @default(autoincrement())
+  user_id     Int?
+  role_id     Int?
+  user_id_relation user?  @relation(fields:[user_id], references: [id])
+  role_id_relation role?  @relation(fields:[role_id], references: [id])
+  createdAt   DateTime?      @default(now())
+  updatedAt   DateTime?      @default(now())
+}
+
+model event_user_review_relation {
+  id          Int           @id                   @default(autoincrement())
+  event_id    Int?
+  user_id     Int?
+  review_id   Int?
+  event_id_relation event?  @relation(fields:[event_id], references: [id])
+  user_id_relation user?  @relation(fields:[user_id], references: [id])
+  review_id_relation review?  @relation(fields:[review_id], references: [id])
+  createdAt   DateTime?      @default(now())
+  updatedAt   DateTime?      @default(now())
+}
+
+model event_ticket_relation {
+  id            Int           @id                   @default(autoincrement())
+  event_id      Int?
+  ticket_id     Int?
+  event_id_relation event?  @relation(fields:[event_id], references: [id])
+  ticket_id_relation ticket?  @relation(fields:[ticket_id], references: [id])
+  createdAt   DateTime?      @default(now())
+  updatedAt   DateTime?      @default(now())
+}
+
+model user_benefit_relation {
+  id            Int           @id                   @default(autoincrement())
+  user_id       Int?
+  benefit_id    Int?
+  user_id_relation user?  @relation(fields:[user_id], references: [id])
+  benefit_id_relation benefit?  @relation(fields:[benefit_id], references: [id])
+  createdAt   DateTime?      @default(now())
+  updatedAt   DateTime?      @default(now())
+}
+
+model event_referral_relation {
+  id          Int           @id                   @default(autoincrement())
+  event_id    Int?
+  referral_id     Int?
+  event_id_relation event?  @relation(fields:[event_id], references: [id])
+  referral_id_relation referral?  @relation(fields:[referral_id], references: [id])
+  createdAt   DateTime?      @default(now())
+  updatedAt   DateTime?      @default(now())
+}
+
+model user_referral_relation {
+  id          Int           @id                   @default(autoincrement())
+  user_id    Int?
+  referral_id     Int?
+  user_id_relation user?  @relation(fields:[user_id], references: [id])
+  referral_id_relation referral?  @relation(fields:[referral_id], references: [id])
+  createdAt   DateTime?      @default(now())
+  updatedAt   DateTime?      @default(now())
+}
+
+model ticket_transaction_relation {
+  id          Int           @id                   @default(autoincrement())
+  ticket_id    Int?
+  transaction_id     Int?
+  ticket_id_relation ticket?  @relation(fields:[ticket_id], references: [id])
+  transaction_id_relation transaction?  @relation(fields:[transaction_id], references: [id])
+  createdAt   DateTime?      @default(now())
+  updatedAt   DateTime?      @default(now())
 }
